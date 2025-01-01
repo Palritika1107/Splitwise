@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-// const cors = require('cors');
+const cors = require('cors');
 
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = "hellorp2024rp";
@@ -8,7 +8,7 @@ const JWT_SECRET = "hellorp2024rp";
 let users =[]; //array of users
 
 
-// app.use(cors());
+app.use(cors());
 app.use(express.json());
 
 
@@ -61,6 +61,16 @@ app.post('/signup',function(req,res){
     const username = req.body.username;
     const password = req.body.password;
 
+    let userAlreadyPresent = users.find((user) => user.username===username && user.password===password);
+
+    if(userAlreadyPresent){
+        res.json({
+            "isPresent" : true,
+            "message" : "username already exists please sign in"
+        })
+    }
+    else{
+
     users.push({
         "username" : username,
         "password" : password
@@ -70,9 +80,10 @@ app.post('/signup',function(req,res){
     console.log(users);
 
     res.json({
+        "isPresent" : false,
         "message" : "you have successfully signed up"
     });
-
+    }
 
 })
 
@@ -97,11 +108,15 @@ app.post('/signin' , function(req,res){
         
     res.json({
 
-        "token" : token
+        "isPresent" : true,
+        "token" : token,
+        "message" : "signed in"
+        
 
     })
 }else{
     res.json({
+        "isPresent" : false,
         "message" : "user not found"
     })
 }
