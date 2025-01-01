@@ -43,7 +43,7 @@ const Login = () => {
 
   return (
     <>
-      <div className="text-teal-600 mx-auto w-6/12  flex  max-w-800px  my-auto">
+      <div className="text-teal-600 mx-auto w-6/12  flex  max-w-800px  my-auto ">
         {/* //left half */}
         <div className="w-8/12  p-9 bg-white flex flex-col justify-around">
            {/* heading 1 */}
@@ -84,14 +84,15 @@ const Login = () => {
 
           
         </div>
+        
 
         {/* //right half */}
         {/* this part if going out of parent box fix it  */}
 
-        <div className="w-4/12  bg-teal-400  text-white flex justify-center items-center p-8">
-          <p className="text-bold text-2xl">
-            {" "}
-            Less stress when sharing expenses{" "}
+        <div className="w-4/12  bg-teal-400  text-white flex justify-center items-center p-8 ">
+          <p className="text-bold text-2xl inline-block">
+            {/* {" "} */}
+            Less stress when sharing expenses
           </p>
         </div>
       </div>

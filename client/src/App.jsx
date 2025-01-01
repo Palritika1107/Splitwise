@@ -23,8 +23,9 @@ axios.defaults.baseURL = 'http://localhost:5000';
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<MainLayout />}>
-    <Route index element={<LoginPage />} />
+    {/* <Route index element={<LoginPage />} /> */}
     {/* <Route path='/creategroup' element={<HomePage />}/> */}
+    <Route index element={<HomePage />}/>
     <Route path='*' element={<NotFoundPage />}/>
     </Route>
   )
