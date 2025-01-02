@@ -15,6 +15,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import HomePage from './pages/HomePage';
 import axios from 'axios';
 
+
 axios.defaults.baseURL = 'http://localhost:5000';
 
 
@@ -32,19 +33,15 @@ const router = createBrowserRouter(
 );
 
 const App = () => {
-//   const[showGroupForm,setShowGroupForm] = useState(false);
-
-//   function initiateGroupCreation(){
-//     setShowGroupForm(true);
-//   }
 
   
     
-
+  // return(
 
       return <RouterProvider router={router} />
+      
 
-
+  // )
 }
 
 export default App

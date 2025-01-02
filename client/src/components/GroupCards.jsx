@@ -1,5 +1,6 @@
 import React from 'react'
 import GroupCard from './GroupCard'
+import CreateGroupButton from '../components/CreateGroupButton'
 
 const GroupCards = () => {
   return (
@@ -7,6 +8,8 @@ const GroupCards = () => {
 
     
     <GroupCard />
+    <CreateGroupButton />
+
     </div>
   )
 }
