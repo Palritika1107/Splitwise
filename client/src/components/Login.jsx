@@ -43,6 +43,8 @@ const Login = () => {
 
   return (
     <>
+    {/* <div className=" bg-gray-900 text-white min-h-screen flex items-center justify-center"> '
+    */}
       <div className="text-teal-600 mx-auto w-6/12  flex  max-w-800px  my-auto ">
         {/* //left half */}
         <div className="w-8/12  p-9 bg-white flex flex-col justify-around">
@@ -96,6 +98,7 @@ const Login = () => {
           </p>
         </div>
       </div>
+      {/* </div> */}
     </>
   );
 };

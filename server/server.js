@@ -4,35 +4,20 @@ const cors = require('cors');
 
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = "hellorp2024rp";
+const { UserModel } = require("./db");
+const mongoose = require("mongoose");
 
-let users =[]; //array of users
+
+// let users =[]; //array of users
+
+mongoose.connect("mongodb+srv://admin:fGUpHgZrZNyqRL7Y@cluster0.zf3dh.mongodb.net/splitwise-database");
 
 
 app.use(cors());
 app.use(express.json());
 
 
-//instead of using this function , we will be using jwt to create a token
-function generateToken(){
 
-    const chars = [
-        ...'abcdefghijklmnopqrstuvwxyz', // Lowercase letters
-        ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ', // Uppercase letters
-        ...'0123456789' // Digits
-      ];
-      
-      
-      let token = "";
-
-      for(let i=1;i<=32;i++){
-
-        token += chars[Math.floor(Math.random() * chars.length)];
-
-
-      }
-
-      return token;
-}
 
 
 function auth(req,res,next){
@@ -56,55 +41,68 @@ function auth(req,res,next){
 }
 
 //signup
-app.post('/signup',function(req,res){
+app.post('/signup',async function(req,res){
 
-    const username = req.body.username;
+    const email = req.body.email;
     const password = req.body.password;
+    const username = req.body.username;
 
-    let userAlreadyPresent = users.find((user) => user.username===username && user.password===password);
+    // let userAlreadyPresent = users.find((user) => user.username===username && user.password===password);
 
-    if(userAlreadyPresent){
-        res.json({
-            "isPresent" : true,
-            "message" : "username already exists please sign in"
-        })
-    }
-    else{
+    const userAlreadyPresent  = UserModel.findOne({
+        email : email,
+        password : password
+    })
 
-    users.push({
+    // if(userAlreadyPresent){
+    //     res.json({
+    //         "isPresent" : true,
+    //         "message" : "username already exists please sign in"
+    //     })
+    // }
+    // else{
+
+    await UserModel.create({
         "username" : username,
-        "password" : password
+        "password" : password,
+        "email" : email
 
     });
 
-    console.log(users);
+    // console.log(users);
 
     res.json({
         "isPresent" : false,
         "message" : "you have successfully signed up"
     });
-    }
+    // }
 
 })
 
 //signin
 
-app.post('/signin' , function(req,res){
+app.post('/signin' , async function(req,res){
 
-    const username = req.body.username;
+    // const username = req.body.username;
+    const email = req.body.email;
     const password = req.body.password;
 
-    const user = users.find((user) => user.username===username && user.password===password);
+    // const user = users.find((user) => user.username===username && user.password===password);
 
-    if(user){
+    const user = await UserModel.findOne({
+        email : email,
+        password : password
+    })
+
+    if(user){ 
         const token = jwt.sign({
 
-            "username" : username
+            "id" : user._id
 
         },JWT_SECRET);
         // user["token"] = token;
 
-        console.log(users);
+        // console.log(users);
         
     res.json({
 

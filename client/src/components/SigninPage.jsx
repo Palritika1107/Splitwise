@@ -36,7 +36,7 @@ const SigninPage = ({formValues,handleChange,isSignup, setIsSignup,setError,erro
 
           localStorage.setItem("token",response.data.token);
 
-          navigate('/creategroup');
+          navigate('/homepage');
         
         }
         else{

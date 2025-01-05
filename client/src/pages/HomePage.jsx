@@ -7,9 +7,8 @@ import GroupForm from '../components/GroupForm'
 const HomePage = () => {
   return (
     <>
-    {/* <GroupCards /> */}
-    {/* <CreateGroupButton /> */}
-    <GroupForm /> 
+    <GroupCards />
+    
     </>
     
   )

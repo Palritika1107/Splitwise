@@ -36,7 +36,7 @@ const SignupPage = ({formValues,handleChange,isSignup, setIsSignup,setError,erro
         }
         else{
           alert(response.data.message);
-        navigate('/creategroup');
+        navigate('/homepage');
         }
   
       } catch (err) {
