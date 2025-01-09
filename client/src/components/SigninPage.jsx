@@ -1,8 +1,34 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useState } from "react";
 
-const SigninPage = ({formValues,handleChange,isSignup, setIsSignup,setError,error}) => {
+const SigninPage = ({isSignup, setIsSignup,setError,error}) => {
+  // ------------------------------------------------------------------------------------
+
+  const [formValues, setFormValues] = useState({
+    username: '',
+    password: '',
+  });
+  
+  
+
+
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    console.log(`${name} : ${value}`);
+
+
+    setFormValues({
+      ...formValues,
+      [name]: value, // Dynamically update state based on input's name attribute
+    });
+  };
+
+
+
+  // -----------------------------------------------------------------------------------
 
     const navigate = useNavigate();
 
@@ -29,7 +55,7 @@ const SigninPage = ({formValues,handleChange,isSignup, setIsSignup,setError,erro
   
         console.log(response.status);
   
-        if(response.data.isPresent){
+        if(response.data.isPresent){ //response.data because axios sends response inside an object named data and not the object directly
           // setIsSignup((isSignup) => !isSignup);
           
           alert(response.data.message);

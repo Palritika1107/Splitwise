@@ -12,10 +12,14 @@ const User = new Schema({
 
 })
 
+
+
 const UserModel = mongoose.model('users', User);
 
+
 module.exports = {
-    UserModel : UserModel
+    UserModel : UserModel,
+
 
 }
 

@@ -6,7 +6,8 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = "hellorp2024rp";
 const { UserModel } = require("./db");
 const mongoose = require("mongoose");
-
+const Schema = mongoose.Schema;
+const ObjectId = Schema.ObjectId;
 
 // let users =[]; //array of users
 
@@ -22,18 +23,22 @@ app.use(express.json());
 
 function auth(req,res,next){
 
-    const token = req.headers.token;
-    const decodedInfo = jwt.verify(token,JWT_SECRET);
-    const username = decodedInfo.username;
+    
 
-    if(username){
-        req.username = username;
-        next();
+    const token = req.headers.token;
+    
+
+    if (!token) {
+        return res.status(401).json({ message: "Token is missing" });
     }
-    else{
-        res.json({
-            "message" : "user not found"
-        })
+
+    try {
+        const decodedInfo = jwt.verify(token, JWT_SECRET);
+        console.log(typeof(decodedInfo.id));
+        req.userId = decodedInfo.id;
+        next();
+    } catch (error) {
+        return res.status(401).json({ message: "Invalid token" });
     }
 
 
@@ -49,10 +54,10 @@ app.post('/signup',async function(req,res){
 
     // let userAlreadyPresent = users.find((user) => user.username===username && user.password===password);
 
-    const userAlreadyPresent  = UserModel.findOne({
-        email : email,
-        password : password
-    })
+    // const userAlreadyPresent  = UserModel.findOne({
+    //     email : email,
+    //     password : password
+    // })
 
     // if(userAlreadyPresent){
     //     res.json({
@@ -94,10 +99,13 @@ app.post('/signin' , async function(req,res){
         password : password
     })
 
+    console.log(user);
+    
+
     if(user){ 
         const token = jwt.sign({
 
-            "id" : user._id
+            "id" : user._id.toString()
 
         },JWT_SECRET);
         // user["token"] = token;
@@ -121,27 +129,30 @@ app.post('/signin' , async function(req,res){
 
 })
 
-app.get('/me',auth,function(req,res){
+app.get('/me',auth,async function(req,res){
+
+    const idString = req.userId;
+    
+    const objectId = new ObjectId(idString);
+    console.log(objectId);
+    // const objectId = new mongoose.Types.ObjectId(idString);
+    
+
+    let findUser =  await UserModel.findOne({
+
+        _id : objectId.path
+
+    })
 
     
-    const username = req.username;
 
-    let findUser = null;
-
-    for(let i=0;i<users.length;i++){
-
-        if(users[i].username === username){
-            findUser = users[i];
-            break;
-        }
-
-    }
+    
 
     if(findUser){
         res.json({
 
             "username" : findUser.username,
-            "password" : findUser.password
+            "email" : findUser.email
 
         })
     }else{
@@ -153,6 +164,7 @@ app.get('/me',auth,function(req,res){
 
 })
 
-app.listen(5000,() => {
+app.listen(
+    5000,() => {
     console.log("server started on port 5000")
 });

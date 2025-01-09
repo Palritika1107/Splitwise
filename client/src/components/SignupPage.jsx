@@ -1,8 +1,31 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useState } from "react";
 
-const SignupPage = ({formValues,handleChange,isSignup, setIsSignup,setError,error}) => {
+const SignupPage = ({isSignup, setIsSignup,setError,error}) => {
+  // ------------------------------------------------------------------------------------------
+  const [formValues, setFormValues] = useState({
+    username: '',
+    password: '',
+    email: ''
+  });
+  
+ 
+
+
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    console.log(`${name} : ${value}`);
+
+
+    setFormValues({
+      ...formValues,
+      [name]: value, // Dynamically update state based on input's name attribute
+    });
+  };
+  // ---------------------------------------------------------------------------------------
 
     const navigate = useNavigate();
 
@@ -12,7 +35,7 @@ const SignupPage = ({formValues,handleChange,isSignup, setIsSignup,setError,erro
         console.log(formValues);
   
   
-        const { username, password } = formValues; // Extract individual variables
+        const { email ,username, password } = formValues; // Extract individual variables
         // console.log('username:', username);
         // console.log('password:', password);
   
@@ -21,7 +44,7 @@ const SignupPage = ({formValues,handleChange,isSignup, setIsSignup,setError,erro
   
       try {
         const response = await axios.post("/signup",{
-  
+          "email" : email,
           "username" : username,
           "password" : password 
   
@@ -32,6 +55,8 @@ const SignupPage = ({formValues,handleChange,isSignup, setIsSignup,setError,erro
         if(response.data.isPresent){
           // setIsSignup((isSignup) => !isSignup);
           setIsSignup(false);
+
+          //add : Existing User!! Please sign up dialogue box
           alert(response.data.message);
         }
         else{
@@ -74,6 +99,24 @@ const SignupPage = ({formValues,handleChange,isSignup, setIsSignup,setError,erro
                 </label>
                 <input
                   type="text"
+                  name="email"
+                  value={formValues.email}
+                  onChange={handleChange}
+              
+                  placeholder="Enter your username"
+                  className="w-full p-2 bg-gray-200 text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-teal-400"
+                 
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  className="block text-gray-600 text-sm mb-2"
+                  htmlFor="field2"
+                >
+                  Username
+                </label>
+                <input
+                  type="text"
                   name="username"
                   value={formValues.username}
                   onChange={handleChange}
@@ -88,7 +131,7 @@ const SignupPage = ({formValues,handleChange,isSignup, setIsSignup,setError,erro
               <div className="mb-4">
                 <label
                   className="block text-gray-600 text-sm mb-2"
-                  htmlFor="field2"
+                  htmlFor="field3"
                 >
                   Password
                 </label>

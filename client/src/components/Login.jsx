@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect , useState } from "react";
 import { Link } from 'react-router-dom';
-import { useState } from "react";
+
+
 
 import SigninPage from "./SigninPage";
 import SignupPage from "./SignupPage";
@@ -13,26 +14,8 @@ import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:5000';
 const Login = () => {
 
-   
-    const [formValues, setFormValues] = useState({
-      username: '',
-      password: '',
-    });
-    const [error, setError] = useState('');
-    const [isSignup,setIsSignup] = useState(true);
-
-
-  
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      console.log(`${name} : ${value}`);
-
-
-      setFormValues({
-        ...formValues,
-        [name]: value, // Dynamically update state based on input's name attribute
-      });
-    };
+  const [isSignup,setIsSignup] = useState(true);
+  const [error, setError] = useState('');
   
     
 
@@ -60,7 +43,7 @@ const Login = () => {
 
           {/* <p>Less stress when sharing expenses with anyone.</p> */}
           {/* heading 2 */}
-          <h1 className="font-bold w-3/12 text-2xl text-center  mx-auto p-4">Sign in</h1>
+          <h1 className="font-bold w-3/12 text-2xl text-center  mx-auto p-4">{isSignup ? "Sign up" : "Sign in"}</h1>
 
           {/* icons */}
           <div className="text-black font-extrabold flex mx-auto w-5/12 justify-around  p-4">
@@ -79,8 +62,8 @@ const Login = () => {
           {/* signin or signup form */}
 
 
-          {isSignup && <SignupPage formValues={formValues}  handleChange={handleChange} isSignup={isSignup} setIsSignup={setIsSignup} setError={setError} error={error}/>}
-          {!isSignup && <SigninPage  formValues={formValues}  handleChange={handleChange} isSignup={isSignup} setIsSignup={setIsSignup} setError={setError} error={error}/>}
+          {isSignup && <SignupPage  isSignup={isSignup} setIsSignup={setIsSignup} setError={setError} error={error}/>}
+          {!isSignup && <SigninPage  isSignup={isSignup} setIsSignup={setIsSignup} setError={setError} error={error}/>}
 
 
 
