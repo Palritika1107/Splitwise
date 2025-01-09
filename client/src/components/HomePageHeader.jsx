@@ -19,7 +19,7 @@ const HomePageHeader = ({openPopup}) => {
                         </button>
                         <nav className="hidden sm:block space-x-8 text-xl" aria-label="main">
                             <Link to="#groups" className="hover:opacity-90">Groups</Link>
-                            <Link to="/addfriend" onClick={openPopup}className="hover:opacity-90">Friends</Link>
+                            <Link to="#" onClick={openPopup}className="hover:opacity-90">Friends</Link>
                             <Link to="#activity" className="hover:opacity-90">Activity</Link>
                             <Link to="#account" className="hover:opacity-90">Account</Link>
 

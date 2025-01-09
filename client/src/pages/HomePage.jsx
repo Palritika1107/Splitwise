@@ -1,6 +1,6 @@
 import {React , useState} from 'react'
-import groups from '../groups.json'
-import { useNavigate } from 'react-router-dom'
+
+
 
 import CreateGroupButton from '../components/CreateGroupButton'
 
@@ -10,18 +10,20 @@ import FriendListPopUp from '../components/FriendListPopUp'
 
 const HomePage = () => {
 
-  const navigate = useNavigate();
+ 
     const [showPopup, setShowPopup] = useState(false);
 
     const openPopup = () => {
       setShowPopup(true);
     };
-  
+
     const closePopup = () => {
       console.log('closePopup triggered');
       setShowPopup(false);
       
     };
+  
+    
 
   return (
     <>

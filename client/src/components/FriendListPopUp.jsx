@@ -4,7 +4,7 @@ import {useState} from "react"
 
 const FriendListPopUp = ({closePopup}) => {
   
-
+ 
 
 
   
