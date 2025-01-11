@@ -7,7 +7,7 @@ const SigninPage = ({isSignup, setIsSignup,setError,error}) => {
   // ------------------------------------------------------------------------------------
 
   const [formValues, setFormValues] = useState({
-    username: '',
+    email: '',
     password: '',
   });
   
@@ -35,10 +35,10 @@ const SigninPage = ({isSignup, setIsSignup,setError,error}) => {
     const handleSubmitSignin = async (e) => {
         // console.log("onsumbit called");
         e.preventDefault(); // Prevent page reload
-        console.log(formValues);
+        console.log(`singup ${formValues.username} ${formValues.email}`);
   
   
-        const { username, password } = formValues; // Extract individual variables
+        const { email , password } = formValues; // Extract individual variables
         // console.log('username:', username);
         // console.log('password:', password);
   
@@ -48,7 +48,7 @@ const SigninPage = ({isSignup, setIsSignup,setError,error}) => {
       try {
         const response = await axios.post("/signin",{
   
-          "username" : username,
+          "email" : email,
           "password" : password 
   
       });
@@ -97,15 +97,15 @@ const SigninPage = ({isSignup, setIsSignup,setError,error}) => {
                   className="block text-gray-600 text-sm mb-2"
                   htmlFor="field1"
                 >
-                  Username
+                  Email-id
                 </label>
                 <input
                   type="text"
-                  name="username"
-                  value={formValues.username}
+                  name="email"
+                  value={formValues.email}
                   onChange={handleChange}
               
-                  placeholder="Enter your username"
+                  placeholder="Enter your email-id"
                   className="w-full p-2 bg-gray-200 text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-teal-400"
                  
                 />

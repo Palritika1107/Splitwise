@@ -12,7 +12,12 @@ const SignupPage = ({isSignup, setIsSignup,setError,error}) => {
   });
   
  
+const handleDublicateSignupError = (response) => {
 
+  setIsSignup(false);
+  alert(response.data.message);
+
+}
 
 
   const handleChange = (e) => {
@@ -32,7 +37,7 @@ const SignupPage = ({isSignup, setIsSignup,setError,error}) => {
     const handleSubmitSignup =async (e) => {
         // console.log("onsumbit called");
         e.preventDefault(); // Prevent page reload
-        console.log(formValues);
+        console.log(`singup ${formValues.username} ${formValues.email}`);
   
   
         const { email ,username, password } = formValues; // Extract individual variables
@@ -50,23 +55,26 @@ const SignupPage = ({isSignup, setIsSignup,setError,error}) => {
   
       });
   
-        console.log(response.status);
+        console.log(`response-data ${response.data.status}`);
   
-        if(response.data.isPresent){
-          // setIsSignup((isSignup) => !isSignup);
-          setIsSignup(false);
+       
+        alert(response.data.message);
+        navigate('/homepage');
+        
+  
+      } catch (err) { 
 
-          //add : Existing User!! Please sign up dialogue box
-          alert(response.data.message);
+
+        console.log(`catch block reached`);
+        if(err.response.data.isPresent)
+        {
+          handleDublicateSignupError(err.response);
         }
         else{
-          alert(response.data.message);
-        navigate('/homepage');
+
+          console.log("uneexpected error");
         }
-  
-      } catch (err) {
-        setError('Login failed. Please check your credentials.');
-        console.log(error);
+
       }
         
   
@@ -95,15 +103,16 @@ const SignupPage = ({isSignup, setIsSignup,setError,error}) => {
                   className="block text-gray-600 text-sm mb-2"
                   htmlFor="field1"
                 >
-                  Username
+                  Email
                 </label>
                 <input
+
                   type="text"
                   name="email"
                   value={formValues.email}
                   onChange={handleChange}
               
-                  placeholder="Enter your username"
+                  placeholder="Enter your email-id"
                   className="w-full p-2 bg-gray-200 text-gray-800 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-teal-400"
                  
                 />

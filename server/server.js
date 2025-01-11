@@ -9,6 +9,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
+
+
 // let users =[]; //array of users
 
 mongoose.connect("mongodb+srv://admin:fGUpHgZrZNyqRL7Y@cluster0.zf3dh.mongodb.net/splitwise-database");
@@ -46,43 +48,40 @@ function auth(req,res,next){
 }
 
 //signup
-app.post('/signup',async function(req,res){
+app.post('/signup', async function (req, res) {
+    const { email,username ,password} = req.body;
 
-    const email = req.body.email;
-    const password = req.body.password;
-    const username = req.body.username;
+    try {
+        // Attempt to create the user
+        const response = await UserModel.create({
+            username: username,
+            password: password,
+            email: email
+        });
 
-    // let userAlreadyPresent = users.find((user) => user.username===username && user.password===password);
+        res.status(201).json({
+            isPresent: false,
+            message: "You have successfully signed up"
+        });
+    } catch (error) {
+        // Handle duplicate email error
+        if (error.code === 11000) {
+            // MongoDB duplicate key error code
+            res.status(409).json({
+                isPresent: true,
+                message: "Email already exists, please sign in"
+            });
+        } else {
+            // Handle other errors
+            console.error('Error during signup:', error);
+            res.status(500).json({
+                isPresent: false,
+                message: "An error occurred. Please try again later."
+            });
+        }
+    }
+});
 
-    // const userAlreadyPresent  = UserModel.findOne({
-    //     email : email,
-    //     password : password
-    // })
-
-    // if(userAlreadyPresent){
-    //     res.json({
-    //         "isPresent" : true,
-    //         "message" : "username already exists please sign in"
-    //     })
-    // }
-    // else{
-
-    await UserModel.create({
-        "username" : username,
-        "password" : password,
-        "email" : email
-
-    });
-
-    // console.log(users);
-
-    res.json({
-        "isPresent" : false,
-        "message" : "you have successfully signed up"
-    });
-    // }
-
-})
 
 //signin
 
@@ -138,11 +137,12 @@ app.get('/me',auth,async function(req,res){
     // const objectId = new mongoose.Types.ObjectId(idString);
     
 
-    let findUser =  await UserModel.findOne({
+    // let findUser =  await UserModel.findOne({
 
-        _id : objectId.path
+    //     _id : objectId.path
 
-    })
+    // })
+   let findUser =  await UserModel.findById(idString); //findById method accepts both string and objectId type argument
 
     
 
@@ -151,9 +151,7 @@ app.get('/me',auth,async function(req,res){
     if(findUser){
         res.json({
 
-            "username" : findUser.username,
-            "email" : findUser.email
-
+            "user" : findUser
         })
     }else{
         res.json({
@@ -163,6 +161,76 @@ app.get('/me',auth,async function(req,res){
 
 
 })
+
+app.get('/friends',auth,async(req,res) => {
+
+    try {
+        const userId = req.userId;
+
+        // Fetch the user and populate the friends field
+        const user = await UserModel.findById(userId).populate('friends', 'username');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({
+            username: user.username,
+            friends: user.friends // This will now include friend objects with their usernames
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+
+    // const userId = req.userId;
+
+    // const user = await UserModel.findById(userId);
+    // console.log(user);
+
+    // res.json({
+    //     "friend-list" : user.friends
+    // })
+
+
+
+})
+
+app.post('/addfriends',auth, async (req, res) => {
+    // const userId  = (new ObjectId(req.userId)).path;
+    const userId = req.userId;
+    const friendEmail = req.body.friendEmail;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ error: 'Invalid user or friend ID' });
+    }
+
+    try {
+        // Ensure both users exist (optional but recommended)
+        const user = await UserModel.findById(userId);
+        const friend = await UserModel.findOne({
+            "email" : friendEmail
+        });
+
+        if (!user || !friend) {
+            return res.status(404).json({ error: 'User or friend not found' });
+        }
+
+        // Add the friend to the user's friends array
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            userId,
+            { $addToSet: { friends: friend._id } }, // Avoid duplicates
+            { new: true } // Return the updated document
+        );
+
+        return res.status(200).json({ message: 'Friend added successfully', 
+            user: updatedUser,
+            friendId : friend._id,
+            fiendUsername : friend.username}); //SHOULD I DO TO_STRING OR NOT CHECK , .findById method accepts both string and ObjectId type of data
+    } catch (error) {
+        console.error('Error adding friend:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 app.listen(
     5000,() => {

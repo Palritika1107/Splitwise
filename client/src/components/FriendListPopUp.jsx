@@ -1,22 +1,80 @@
-import React from 'react'
-import {useState} from "react"
-
+import React from 'react';
+import {useState , useEffect} from "react";
+import axios from 'axios';
 
 const FriendListPopUp = ({closePopup}) => {
   
- 
+const [friend, setFriend] = useState(""); 
+const [friendsList, setFriendsList] = useState([]);//want to inistialise friendsList from database on first fetch how to do?
 
+const [userFlag,setUserflag] = useState(true);
 
-  
-  const [friend, setFriend] = useState("");
-  const [friendsList, setFriendsList] = useState([]);
+useEffect(() => {
+  const fetchUserData = async () => {
+    try {
+      // Fetch the user data (replace with your actual API endpoint)
+      const token = localStorage.getItem('token');  // Assuming token is stored in localStorage
+      console.log(token);
+      const response = await axios.get('/friends', {
+        headers: {
+          token: token,  // Sending the token in the header for authentication
+        }
+      });
+
+      // Assuming the response contains the 'friends' array
+      const user = response.data;
+      setFriendsList(user.friends); // Initialize friends list state with data from the user
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  fetchUserData();
+}, []);
+
 
   
 
   const handleAddFriend = () => {
-    if (friend.trim()) {
-      setFriendsList([...friendsList, friend]);
-      setFriend("");
+
+    if(friend.trim()) {
+
+      const email = friend.trim();
+
+      const token = localStorage.getItem('token');
+      console.log(`token ${token}`);
+
+      const response = axios.post("/addfriends", 
+        {
+          "friendEmail" : email 
+        },
+        {
+        headers: {
+            'token': token
+        }
+      
+    })
+
+      if(response.data.user){
+        const _id = response.data.friendId;
+        const username = response.data.fiendUsername;
+        console.log("id",_id);
+        console.log(username);
+
+
+
+        setFriendsList([...friendsList, {
+          "_id" : _id,
+          "username" : username
+        }]); 
+        setFriend("");
+        setUserflag(true);
+
+      }
+      else{
+          setUserflag(false);
+      }
+      
     }
   };
 
@@ -41,9 +99,10 @@ const FriendListPopUp = ({closePopup}) => {
                 type="text"
                 value={friend}
                 onChange={(e) => setFriend(e.target.value)}
-                placeholder="Enter friend's name"
+                placeholder="Enter friend's username"
                 className="w-full bg-gray-700 rounded-lg border border-gray-700 text-sm p-3 outline-none focus:ring-2 focus:ring-teal-500 mb-4"
               />
+              {!userFlag && <p className='text-red'>invalid email id! re-enter email-id.</p>}
               <button
                 onClick={handleAddFriend}
                 className="w-full py-3 bg-teal-700 text-white rounded-md text-lg font-medium hover:bg-teal-600 transition"
@@ -58,7 +117,7 @@ const FriendListPopUp = ({closePopup}) => {
                     key={index}
                     className="bg-gray-700 px-4 py-2 rounded-lg text-gray-300"
                   >
-                    {f}
+                    {f.username}
                   </li>
                 ))}
               </ul>

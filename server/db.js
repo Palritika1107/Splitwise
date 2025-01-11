@@ -8,7 +8,8 @@ const User = new Schema({
 
     username : String,
     password : String,
-    email : {type : String,unique : true}
+    email : {type : String,unique : true},
+    friends: [{ type: Schema.Types.ObjectId, ref: 'User' }] // Array of references to User documents
 
 })
 
