@@ -6,14 +6,21 @@ const GroupForm = () => {
 
   // Add a new item field
   const addItem = () => {
+    let n = items.length;
+
+    if(items[n - 1].length){
+
     setItems([...items, ""]);
+    }
   };
 
   // Handle input change for individual items
   const handleItemChange = (index, value) => {
+    
     const newItems = [...items];
     newItems[index] = value;
     setItems(newItems);
+    
   };
 
   return (

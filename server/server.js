@@ -163,12 +163,24 @@ app.get('/me',auth,async function(req,res){
 })
 
 app.get('/friends',auth,async(req,res) => {
+    const userId = req.userId;
+    
+
 
     try {
-        const userId = req.userId;
+        
 
         // Fetch the user and populate the friends field
         const user = await UserModel.findById(userId).populate('friends', 'username');
+
+        if(user.friends.length){
+            const n = user.friends.length;
+            
+            for(let i=0;i<n;i++){
+                console.log(user.friends[i]);
+            }
+        }
+
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -225,7 +237,7 @@ app.post('/addfriends',auth, async (req, res) => {
         return res.status(200).json({ message: 'Friend added successfully', 
             user: updatedUser,
             friendId : friend._id,
-            fiendUsername : friend.username}); //SHOULD I DO TO_STRING OR NOT CHECK , .findById method accepts both string and ObjectId type of data
+            friendUsername : friend.username}); //SHOULD I DO TO_STRING OR NOT CHECK , .findById method accepts both string and ObjectId type of data
     } catch (error) {
         console.error('Error adding friend:', error);
         res.status(500).json({ error: 'Internal server error' });

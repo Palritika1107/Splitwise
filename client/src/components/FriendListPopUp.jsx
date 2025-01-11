@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const FriendListPopUp = ({closePopup}) => {
   
-const [friend, setFriend] = useState(""); 
+const [friendEmail, setFriendEmail] = useState(""); 
 const [friendsList, setFriendsList] = useState([]);//want to inistialise friendsList from database on first fetch how to do?
 
 const [userFlag,setUserflag] = useState(true);
@@ -14,7 +14,7 @@ useEffect(() => {
     try {
       // Fetch the user data (replace with your actual API endpoint)
       const token = localStorage.getItem('token');  // Assuming token is stored in localStorage
-      console.log(token);
+      // console.log(token);
       const response = await axios.get('/friends', {
         headers: {
           token: token,  // Sending the token in the header for authentication
@@ -35,16 +35,16 @@ useEffect(() => {
 
   
 
-  const handleAddFriend = () => {
+  const handleAddFriend = async() => {
 
-    if(friend.trim()) {
+    if(friendEmail.trim()) {
 
-      const email = friend.trim();
+      const email = friendEmail.trim();
 
       const token = localStorage.getItem('token');
-      console.log(`token ${token}`);
+      // console.log(`token ${token}`);
 
-      const response = axios.post("/addfriends", 
+      const response = await axios.post("/addfriends", 
         {
           "friendEmail" : email 
         },
@@ -57,7 +57,7 @@ useEffect(() => {
 
       if(response.data.user){
         const _id = response.data.friendId;
-        const username = response.data.fiendUsername;
+        const username = response.data.friendUsername;
         console.log("id",_id);
         console.log(username);
 
@@ -67,7 +67,7 @@ useEffect(() => {
           "_id" : _id,
           "username" : username
         }]); 
-        setFriend("");
+        setFriendEmail("");
         setUserflag(true);
 
       }
@@ -97,9 +97,9 @@ useEffect(() => {
               <h2 className="text-2xl font-bold mb-4 text-teal-500">Add a Friend</h2>
               <input
                 type="text"
-                value={friend}
-                onChange={(e) => setFriend(e.target.value)}
-                placeholder="Enter friend's username"
+                value={friendEmail}
+                onChange={(e) => setFriendEmail(e.target.value)}
+                placeholder="Enter friend's email-id"
                 className="w-full bg-gray-700 rounded-lg border border-gray-700 text-sm p-3 outline-none focus:ring-2 focus:ring-teal-500 mb-4"
               />
               {!userFlag && <p className='text-red'>invalid email id! re-enter email-id.</p>}
