@@ -14,21 +14,23 @@ const GroupCard = () => {
           headers: { token },
         });
         let groupList = response.data.user.groups;
+        console.log(`groupList : ${groupList}`);
+
         let tempGroupList = [];
 
         for(let i=0;i<groupList.length;i++){
 
-          const groupObj = await axios.get('/get-group',{
+          console.log(`groupList[i] : ${groupList[i]}`);
 
-              "groupId" : groupList[i]
+          const groupObj = await axios.get(`/get-group/?groupId=${groupList[i]}`);
+          console.log(groupObj);
 
-          });
-
-          tempGroupList.push(groupObj);
+          tempGroupList.push(groupObj.data.group);
 
         }
 
         setGroups(tempGroupList); // Assuming API response has a `groups` field
+        console.log(groups);
       } catch (error) {
         console.error("Error fetching groups:", error);
       } finally {

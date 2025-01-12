@@ -244,8 +244,9 @@ app.post('/addfriends',auth, async (req, res) => {
     }
 });
 
-app.get("/get-group",async(req,res) => {
-    let groupId = req.body.groupId;
+app.get("/get-group/",async(req,res) => {
+    let groupId = req.query.groupId;
+    // console.log(groupId);
 
     try{
 
