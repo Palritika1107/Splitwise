@@ -37,12 +37,14 @@ useEffect(() => {
 
   const handleAddFriend = async() => {
 
-    if(friendEmail.trim()) {
+    if(friendEmail.trim()){
 
       const email = friendEmail.trim();
 
       const token = localStorage.getItem('token');
       // console.log(`token ${token}`);
+
+      try{
 
       const response = await axios.post("/addfriends", 
         {
@@ -55,25 +57,40 @@ useEffect(() => {
       
     })
 
-      if(response.data.user){
-        const _id = response.data.friendId;
-        const username = response.data.friendUsername;
-        console.log("id",_id);
-        console.log(username);
+     
+    const newFriend = {
+      _id: response.data.friendId,
+      username: response.data.friendUsername,
+    };
 
+    // Check if the friend is already in the list
+    setFriendsList((prevFriendsList) => {
+      const isDuplicate = prevFriendsList.some(
+        (friend) => friend._id === newFriend._id
+      );
 
-
-        setFriendsList([...friendsList, {
-          "_id" : _id,
-          "username" : username
-        }]); 
-        setFriendEmail("");
-        setUserflag(true);
-
+      if (!isDuplicate) {
+        return [...prevFriendsList, newFriend]; // Add only if not a duplicate
       }
-      else{
+
+
+      alert("friend already exists!");
+      return prevFriendsList;
+
+      });
+ 
+      setFriendEmail("");
+      setUserflag(true);
+
+      
+
+      }catch(err){
+
+          console.log("catch block reached ");
+      
           setUserflag(false);
-      }
+      
+    }
       
     }
   };
@@ -102,7 +119,7 @@ useEffect(() => {
                 placeholder="Enter friend's email-id"
                 className="w-full bg-gray-700 rounded-lg border border-gray-700 text-sm p-3 outline-none focus:ring-2 focus:ring-teal-500 mb-4"
               />
-              {!userFlag && <p className='text-red'>invalid email id! re-enter email-id.</p>}
+              {!userFlag && <p className="text-red-700">invalid email id! re-enter email-id.</p>}
               <button
                 onClick={handleAddFriend}
                 className="w-full py-3 bg-teal-700 text-white rounded-md text-lg font-medium hover:bg-teal-600 transition"

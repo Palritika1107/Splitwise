@@ -4,7 +4,7 @@ const cors = require('cors');
 
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = "hellorp2024rp";
-const { UserModel } = require("./db");
+const { UserModel , GroupModel } = require("./db");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
@@ -230,7 +230,7 @@ app.post('/addfriends',auth, async (req, res) => {
         // Add the friend to the user's friends array
         const updatedUser = await UserModel.findByIdAndUpdate(
             userId,
-            { $addToSet: { friends: friend._id } }, // Avoid duplicates
+            { $addToSet: { friends: friend._id } }, // addToSet function Avoid duplicates 
             { new: true } // Return the updated document
         );
 
@@ -243,6 +243,90 @@ app.post('/addfriends',auth, async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+app.get("/get-group",async(req,res) => {
+    let groupId = req.body.groupId;
+
+    try{
+
+    const group = await GroupModel.findOne({
+       "_id" : groupId
+    })
+
+    
+
+    res.json({
+        "group" : group
+    })
+
+}catch(err){
+    console.log(`get-group error : ${err}`);
+}
+
+
+
+
+});
+
+app.post("/create-group", auth, async (req, res) => {
+    let userId = req.userId;
+    try {
+      const { groupName, members } = req.body;
+  
+      // Validate request body
+      if (!groupName || !Array.isArray(members) || members.length === 0) {
+        return res.status(400).json({ error: "Invalid groupName or members list" });
+      }
+  
+      // Check if all members exist in the users collection
+      const users = await UserModel.find({ _id: { $in: members } });
+      if (users.length !== members.length) {
+        return res.status(400).json({ error: "One or more members do not exist" });
+      }
+  
+      // Create and save the group
+      const group = await GroupModel.create({
+        groupName,
+        members,
+        createdBy: req.userId,
+      });
+
+      //add group _id to each members "group" array
+      //add to person who created group
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        { $addToSet: { groups: group._id } }, // addToSet function Avoid duplicates 
+        { new: true } // Return the updated document
+    );
+
+    //add to group list of other members who created group
+    for(let i=0;i<members.length;i++){
+
+        let memberId = new ObjectId(members[i]);
+
+        const updatedMember = await UserModel.findByIdAndUpdate(
+            memberId.path,
+            { $addToSet: { groups: group._id } }, // addToSet function Avoid duplicates 
+            { new: true } // Return the updated document
+        );
+
+
+        console.log(`other members ${updatedMember.username}`);
+    }
+
+
+
+
+  
+      res.status(201).json({ message: "Group created successfully", group });
+    } catch (error) {
+      console.error("Error creating group:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+
+
+
 
 app.listen(
     5000,() => {
