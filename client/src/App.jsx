@@ -17,6 +17,7 @@ import axios from 'axios';
 import FormPage from './pages/FormPage';
 import FriendListPopUp from './components/FriendListPopUp';
 import Login from './components/Login';
+import GroupHomePage from './components/GroupHomePage';
 
 
 
@@ -29,7 +30,8 @@ axios.defaults.baseURL = 'http://localhost:5000';
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<MainLayout />}>
-    <Route index element={<Login />} />
+      
+    <Route index element={<GroupHomePage />} />
     {/* <Route path='/creategroup' element={<HomePage />}/> */}
     <Route path='/homepage' element={<HomePage />}/>
     <Route path='/groupform' element={<FormPage />}/>

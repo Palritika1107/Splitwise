@@ -133,7 +133,7 @@ app.get('/me',auth,async function(req,res){
     const idString = req.userId;
     
     const objectId = new ObjectId(idString);
-    console.log(objectId);
+    console.log(`me ${objectId}`);
     // const objectId = new mongoose.Types.ObjectId(idString);
     
 
@@ -250,7 +250,7 @@ app.get("/get-group/",async(req,res) => {
 
     try{
 
-    const group = await GroupModel.findOne({
+    const group = await GroupModel.findById({
        "_id" : groupId
     })
 
@@ -325,6 +325,81 @@ app.post("/create-group", auth, async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
     }
   });
+
+  app.post('/add-expense', async (req, res) => {
+    const { groupId, description, amount, payerIdString } = req.body;
+    
+    // const {payerIdString} = req.body;
+    const payerIdObj = new ObjectId(payerIdString); 
+    
+
+
+
+    try {
+      const group = await GroupModel.findById(groupId);
+      if (!group) return res.status(404).json({ error: 'Group not found' });
+  
+      const numMembers = group.members.length;
+      const splitAmount = amount / numMembers;
+  
+      // Create splits
+      const splits = group.members.map((member) => ({
+        member: member,
+        amount: splitAmount,
+        paid: member.toString() === payerIdString, // Mark payer's split as paid
+      }));
+
+
+  
+      // Add the expense
+      const expense = {
+        description,
+        amount,
+        payer: payerIdObj,
+        createdAt : Date.now(),
+        splits,
+      };
+  
+      group.expenses.push(expense);
+      await group.save();
+  
+      res.json({ success: true, group,expense});
+    } catch (error) {
+      console.error('Error adding expense:', error);
+      res.status(500).json({ error: 'Failed to add expense' });
+    }
+    // res.json({
+    //     "message" : "success"
+    // })
+  });
+
+
+  app.post('/pay-expense', async (req, res) => {
+    const { groupId, expenseId, memberId } = req.body;
+  
+    try {
+      const group = await GroupModel.findById(groupId);
+      if (!group) return res.status(404).json({ error: 'Group not found' });
+  
+      const expense = group.expenses.id(expenseId);
+      if (!expense) return res.status(404).json({ error: 'Expense not found' });
+  
+      const split = expense.splits.find((s) => s.member.toString() === memberId);
+      if (!split || split.paid) {
+        return res.status(400).json({ error: 'No payment due or already paid' });
+      }
+  
+      split.paid = true; // Mark the split as paid
+      await group.save();
+  
+      res.json({ success: true, group });
+    } catch (error) {
+      console.error('Error updating payment:', error);
+      res.status(500).json({ error: 'Failed to update payment' });
+    }
+  });
+  
+  
 
 
 
