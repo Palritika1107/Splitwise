@@ -31,11 +31,13 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<MainLayout />}>
       
-    <Route index element={<GroupHomePage />} />
+    <Route index element={<Login/>} />
     {/* <Route path='/creategroup' element={<HomePage />}/> */}
+
     <Route path='/homepage' element={<HomePage />}/>
     <Route path='/groupform' element={<FormPage />}/>
     <Route path='/addfriend' element={<FriendListPopUp/>}/>
+    <Route path='/group/:id' element={<GroupHomePage />}/>
     <Route path='*' element={<NotFoundPage />}/>
     </Route>
   )

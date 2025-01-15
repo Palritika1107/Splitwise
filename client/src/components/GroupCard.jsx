@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const GroupCard = () => {
   const [groups, setGroups] = useState([]); // State to store the user's groups
@@ -57,10 +58,20 @@ const GroupCard = () => {
           Groups
         </h2>
         {groups.length > 0 ? (
+       
+          
           <ul className="list-none mx-auto my-12 flex flex-col sm:flex-row items-center gap-8">
             {groups.map((group, index) => (
+              <Link
+              key={group._id}
+              to={{
+                pathname: `/group/${group._id}`,
+              }}
+              state={{ groupName: group.name, groupId: group._id }}
+              className="text-blue-500 hover:underline"
+            >
               <li
-                key={index}
+                
                 className="w-2/3 sm:w-5/6 flex flex-col items-center border border-solid border-slate-900 dark:border-gray-100 bg-white dark:bg-black py-6 px-2 rounded-3xl shadow-xl"
               >
                 <img
@@ -75,6 +86,7 @@ const GroupCard = () => {
                   {group.members.length} Members
                 </p>
               </li>
+            </Link>
             ))}
           </ul>
         ) : (

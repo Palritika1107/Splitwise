@@ -5,17 +5,18 @@ import { useNavigate } from 'react-router-dom';
 
 
 const GroupForm = () => {
-  const [items, setItems] = useState([""]); // Array to hold items , friends added to the group
+  const [items, setItems] = useState([""]); // Array to hold items , friends added to the group + person creatibg group
   const [friendsList, setFriendsList] = useState([]); // Array to hold all friends
   const [groupName, setGroupName] = useState("");
 
   const navigate = useNavigate();
+  const token = localStorage.getItem("token"); 
 
   // Fetch friend list on component mount
   useEffect(() => {
     const fetchFriends = async () => {
       try {
-        const token = localStorage.getItem("token"); // Get the token
+        // Get the token
         const response = await axios.get("/friends", {
           headers: { token },
         });
@@ -49,15 +50,29 @@ const GroupForm = () => {
     );
   };
 
+  
+
   // Handle group creation (submit form)
   const handleSubmit = async (e) => {
 
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
+
+      const userRes = await axios.get('/me',{
+        headers : {
+          "token" : token
+        }
+      })
+      console.log(userRes.data.user._id);
+
+     const membersArr = [...items,userRes.data.user._id.toString()];
+
+     console.log(`members arr to add : ${membersArr}`);
+
       const response = await axios.post(
         "/create-group",
-        { groupName, members: items },
+        { groupName, 
+          members:membersArr},
         { headers: { token } }
       );
       console.log("Group created:", response.data);

@@ -1,19 +1,27 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useParams, useLocation } from 'react-router-dom';
 
-const GroupHomePage = ({groupId = '6783f4ab1e3a18a037d14406'}) => {
+const GroupHomePage = () => {
+
+    const { id } = useParams(); // Extract the group ID from the URL
+  const location = useLocation();
+  const { groupName, groupId } = location.state;
+
   const [expenses, setExpenses] = useState([]);
   const [newExpense, setNewExpense] = useState({ description: "", amount: "" });
   const [isAddingExpense, setIsAddingExpense] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState("");
 
 
 
-  const token = localStorage.getItem("token");
+  
 
-  let currentUserId = 0;// Replace with logged-in user ID
+//   let currentUserId = 0;// Replace with logged-in user ID
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
     const fetchExpenses = async () => {
       try {
         const userRes = await axios.get('/me',{
@@ -23,13 +31,12 @@ const GroupHomePage = ({groupId = '6783f4ab1e3a18a037d14406'}) => {
         })
         // console.log(`grouphomepage userees : ${userRes}`);
 
-        currentUserId = userRes.data.user._id;
-      
-        console.log(`grouphomepage userees : ${typeof(currentUserId)}`);
+        
 
-        const response = await axios.get('/get-group/', {
-            params: { groupId } // Sending groupId as a query parameter
-        });
+        setCurrentUserId(userRes.data.user._id.toString());
+        console.log(currentUserId);
+
+        const response = await axios.get(`/get-group/?groupId=${groupId}`);
 
         setExpenses(response.data.group.expenses);
       } catch (error) {
@@ -41,6 +48,12 @@ const GroupHomePage = ({groupId = '6783f4ab1e3a18a037d14406'}) => {
 
     fetchExpenses();
   }, [groupId]);
+
+  useEffect(() => {
+    if (currentUserId) {
+        console.log("Current User ID:", currentUserId);
+    }
+}, [currentUserId]);
 
   const handleAddExpense = async () => {
     if (!newExpense.description || !newExpense.amount) return;
@@ -94,7 +107,9 @@ const GroupHomePage = ({groupId = '6783f4ab1e3a18a037d14406'}) => {
                     : "bg-gray-700 text-gray-300"
                 }`}
               >
-                <p className="text-lg font-bold">₹{expense.amount}</p>
+                <p className="text-lg font-bold">₹{(expense.splits.find((obj) =>  obj.member === currentUserId
+                )|| { amount: 0 }
+                ).amount}</p>
                 <p className="text-sm">{expense.description}</p>
                 <p className="text-xs mt-2">
                   {expense.payer === currentUserId ? "You" : "Other User"}

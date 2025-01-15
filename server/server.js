@@ -6,8 +6,8 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = "hellorp2024rp";
 const { UserModel , GroupModel } = require("./db");
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
+// const Schema = mongoose.Schema;
+const ObjectId = mongoose.Types.ObjectId;
 
 
 
@@ -132,8 +132,8 @@ app.get('/me',auth,async function(req,res){
 
     const idString = req.userId;
     
-    const objectId = new ObjectId(idString);
-    console.log(`me ${objectId}`);
+    // const objectId = new ObjectId(idString);
+    // console.log(`me ${typeof(objectId)}`);
     // const objectId = new mongoose.Types.ObjectId(idString);
     
 
@@ -189,7 +189,7 @@ app.get('/friends',auth,async(req,res) => {
             username: user.username,
             friends: user.friends // This will now include friend objects with their usernames
         });
-    } catch (error) {
+    } catch (error){
         console.error(error);
         res.status(500).json({ message: 'Server error' });
     }
@@ -294,6 +294,7 @@ app.post("/create-group", auth, async (req, res) => {
 
       //add group _id to each members "group" array
       //add to person who created group
+
       const updatedUser = await UserModel.findByIdAndUpdate(
         userId,
         { $addToSet: { groups: group._id } }, // addToSet function Avoid duplicates 
@@ -304,9 +305,10 @@ app.post("/create-group", auth, async (req, res) => {
     for(let i=0;i<members.length;i++){
 
         let memberId = new ObjectId(members[i]);
+        console.log(memberId);
 
         const updatedMember = await UserModel.findByIdAndUpdate(
-            memberId.path,
+            memberId.toString(),
             { $addToSet: { groups: group._id } }, // addToSet function Avoid duplicates 
             { new: true } // Return the updated document
         );
@@ -328,11 +330,16 @@ app.post("/create-group", auth, async (req, res) => {
 
   app.post('/add-expense', async (req, res) => {
     const { groupId, description, amount, payerIdString } = req.body;
+
+    if (!payerIdString || !ObjectId.isValid(payerIdString)) {
+        return res.status(400).json({ error: 'Invalid payerIdString' });
+      }
     
     // const {payerIdString} = req.body;
-    const payerIdObj = new ObjectId(payerIdString); 
+    const payerIdObj = new ObjectId(payerIdString);
     
 
+    console.log(payerIdObj);
 
 
     try {
@@ -341,6 +348,7 @@ app.post("/create-group", auth, async (req, res) => {
   
       const numMembers = group.members.length;
       const splitAmount = amount / numMembers;
+      
   
       // Create splits
       const splits = group.members.map((member) => ({
@@ -349,6 +357,7 @@ app.post("/create-group", auth, async (req, res) => {
         paid: member.toString() === payerIdString, // Mark payer's split as paid
       }));
 
+      console.log(splits);
 
   
       // Add the expense
