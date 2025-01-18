@@ -419,31 +419,40 @@ app.post("/create-group", auth, async (req, res) => {
   });
 
   // Route to fetch paginated items
-app.get("/group/expenses", async (req, res) => {
-
+  app.get("/group/expenses", async (req, res) => {
     const { page, pageSize, groupId } = req.query;
-
-    const pageNumber = parseInt(page, 10);
-  const limitNumber = parseInt(pageSize, 10);
-
-    try {
-        const group = await GroupModel.findOne(
-          { _id: groupId },
-          { expenses: { $slice: [(pageNumber - 1) * limitNumber, limitNumber] } } // Apply skip and limit
-        );
-    
-        if (!group) {
-          return res.status(404).json({ error: "Group not found" });
-        }
-    
-        res.json(group.expenses); // Return the paginated expenses
-      } catch (err) {
-        console.error("Error fetching expenses:", err);
-        res.status(500).json({ error: "Internal server error" });
-      }
-    
-  });
   
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(pageSize, 10);
+  
+    try {
+      // Use MongoDB aggregation to reverse and paginate the expenses array
+      const result = await GroupModel.aggregate([
+        { $match: { _id: new ObjectId(groupId) } }, // Match the group by ID
+        {
+          $project: {
+            expenses: { $reverseArray: "$expenses" }, // Reverse the expenses array
+          },
+        },
+        {
+          $project: {
+            expenses: {
+              $slice: ["$expenses", (pageNumber - 1) * limitNumber, limitNumber], // Apply pagination
+            },
+          },
+        },
+      ]);
+  
+      if (!result || result.length === 0) {
+        return res.status(404).json({ error: "Group not found" });
+      }
+  
+      res.json(result[0].expenses); // Return the reversed and paginated expenses
+    } catch (err) {
+      console.error("Error fetching expenses:", err);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
   
 
 

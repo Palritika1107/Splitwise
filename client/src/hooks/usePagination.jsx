@@ -1,41 +1,43 @@
 import { useState, useCallback } from "react";
 
-const usePagination = (fetchExpenses, pageSize) => {
-  const [expenses, setExpenses] = useState([]); // All items
+const usePagination = (fetchExpenses, pageSize, setMainExpenses) => {
+  const [loadedPages, setLoadedPages] = useState(new Set());
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1); // Current page
-  const [loading, setLoading] = useState(false); // Loading state
-  const [hasMore, setHasMore] = useState(true); // Whether more data exists
 
-  // Load items for a specific page
   const loadMore = useCallback(
     async (newPage, isScrollUp = false, previousScrollHeight = 0) => {
-      if (loading) return;
+      if (loading || loadedPages.has(newPage)) return; // Prevent duplicate calls
       setLoading(true);
-      console.log('page scrolled')
-      const newExpenses = await fetchExpenses(newPage, pageSize);
 
-      if (isScrollUp) {
-        // Scroll-Up: Prepend items
-        setExpenses((prevExpenses) => [...newExpenses, ...prevExpenses]);
-        setTimeout(() => {
-          // Adjust scroll position
-          const newScrollHeight = document.documentElement.scrollHeight;
-          window.scrollTo(0, newScrollHeight - previousScrollHeight);
-        }, 0);
-      } else {
-        // Scroll-Down: Append items
-        setExpenses((prevExpenses) => [...prevExpenses, ...newExpenses]);
-        //don't i need to adjust scroll position while scrolling down ?? : DOUBT??????
+      try {
+        const newExpenses = await fetchExpenses(newPage, pageSize);
+
+        setMainExpenses((prev) => {
+          const prevIds = new Set(prev.map((expense) => expense._id));
+          const uniqueNewExpenses = newExpenses.filter(
+            (expense) => !prevIds.has(expense._id)
+          );
+
+          return isScrollUp
+            ? [...uniqueNewExpenses, ...prev]
+            : [...prev, ...uniqueNewExpenses];
+        });
+
+        setLoadedPages((prev) => new Set(prev).add(newPage));
+        setHasMore(newExpenses.length === pageSize);
+        setPage(newPage);
+      } catch (error) {
+        console.error("Error loading more expenses:", error);
+      } finally {
+        setLoading(false);
       }
-
-      setHasMore(newExpenses.length === pageSize); // Check if more items are available
-      setPage(newPage); // Update the current page
-      setLoading(false);
     },
-    [fetchExpenses, pageSize, loading]
+    [fetchExpenses, pageSize, loading, loadedPages, setMainExpenses]
   );
 
-  return { expenses, loadMore, loading, hasMore, page };
+  return { loadMore, loading, hasMore ,page};
 };
 
 export default usePagination;

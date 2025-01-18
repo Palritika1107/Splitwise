@@ -11,6 +11,7 @@ const GroupHomePage = () => {
     const { id } = useParams(); // Extract the group ID from the URL
   const location = useLocation();
   const { groupName , groupId } = location.state;
+  const [expenses, setExpenses] = useState([]); // All expenses
 
 //   const [expenses, setExpenses] = useState([]);
   const [newExpense, setNewExpense] = useState({ description: "", amount: "" });
@@ -70,7 +71,7 @@ useEffect(() => {
       console.log(response.data);
       console.log(response.data.expense);
 
-      setExpenses((prevExpenses) => [...prevExpenses, response.data.expense]);
+      setExpenses((prevExpenses) => [response.data.expense,...prevExpenses]);//todo -> tored in revrse 
       setIsAddingExpense(false);
       
     } catch (error) {
@@ -120,7 +121,7 @@ const fetchData = async (page, pageSize) => {
 
   console.log('before pagination');
 
-const { expenses, loadMore, loading, hasMore, page} = usePagination(fetchData, 3);
+const {loadMore, loading, hasMore, page} = usePagination(fetchData, 4,setExpenses);
 
 useEffect(() => {
     loadMore(1); // Trigger load on mount
