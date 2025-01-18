@@ -14,7 +14,7 @@ import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:000';
 const Login = () => {
 
-  const [isSignup,setIsSignup] = useState(true);
+  const [isSignin,setIsSignin] = useState(true);
   const [error, setError] = useState('');
   
     
@@ -43,7 +43,7 @@ const Login = () => {
 
           {/* <p>Less stress when sharing expenses with anyone.</p> */}
           {/* heading 2 */}
-          <h1 className="font-bold w-3/12 text-2xl text-center  mx-auto p-4">{isSignup ? "Sign up" : "Sign in"}</h1>
+          <h1 className="font-bold w-3/12 text-2xl text-center  mx-auto p-4">{!isSignin ? "Sign up" : "Sign in"}</h1>
 
           {/* icons */}
           <div className="text-black font-extrabold flex mx-auto w-5/12 justify-around  p-4">
@@ -62,8 +62,8 @@ const Login = () => {
           {/* signin or signup form */}
 
 
-          {isSignup && <SignupPage  isSignup={isSignup} setIsSignup={setIsSignup} setError={setError} error={error}/>}
-          {!isSignup && <SigninPage  isSignup={isSignup} setIsSignup={setIsSignup} setError={setError} error={error}/>}
+          {!isSignin && <SignupPage  isSignin={isSignin} setIsSignin={setIsSignin} setError={setError} error={error}/>}
+          {isSignin && <SigninPage  isSignin={isSignin} setIsSignin={setIsSignin} setError={setError} error={error}/>}
 
 
 

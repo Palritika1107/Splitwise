@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useState } from "react";
 
-const SignupPage = ({isSignup, setIsSignup,setError,error}) => {
+const SignupPage = ({setIsSignin,setError,error}) => {
   // ------------------------------------------------------------------------------------------
   const [formValues, setFormValues] = useState({
     username: '',
@@ -14,7 +14,7 @@ const SignupPage = ({isSignup, setIsSignup,setError,error}) => {
  
 const handleDublicateSignupError = (response) => {
 
-  setIsSignup(false);
+  setIsSignin(true);
   alert(response.data.message);
 
 }

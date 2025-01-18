@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useState } from "react";
 
-const SigninPage = ({isSignup, setIsSignup,setError,error}) => {
+const SigninPage = ({setIsSignin,setError,error}) => {
   // ------------------------------------------------------------------------------------
 
   const [formValues, setFormValues] = useState({
@@ -67,7 +67,7 @@ const SigninPage = ({isSignup, setIsSignup,setError,error}) => {
         }
         else{
           alert(response.data.message);
-          setIsSignup(true);
+          setIsSignin(false);
         }
   
       } catch (err) {
