@@ -1,18 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useCallback } from "react";
 import axios from "axios";
 import { useParams, useLocation } from 'react-router-dom';
+import usePagination from "../hooks/usePagination.jsx";
+
+
+  
 
 const GroupHomePage = () => {
 
     const { id } = useParams(); // Extract the group ID from the URL
   const location = useLocation();
-  const { groupName, groupId } = location.state;
+  const { groupName , groupId } = location.state;
 
-  const [expenses, setExpenses] = useState([]);
+//   const [expenses, setExpenses] = useState([]);
   const [newExpense, setNewExpense] = useState({ description: "", amount: "" });
   const [isAddingExpense, setIsAddingExpense] = useState(false);
-  const [loading, setLoading] = useState(true);
+//   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState("");
+
+  
 
 
 
@@ -20,9 +26,11 @@ const GroupHomePage = () => {
 
 //   let currentUserId = 0;// Replace with logged-in user ID
 
-  useEffect(() => {
+ 
+
+useEffect(() => {
     const token = localStorage.getItem("token");
-    const fetchExpenses = async () => {
+    const fetchCurrentUser = async () => {
       try {
         const userRes = await axios.get('/me',{
             headers:{
@@ -36,24 +44,14 @@ const GroupHomePage = () => {
         setCurrentUserId(userRes.data.user._id.toString());
         console.log(currentUserId);
 
-        const response = await axios.get(`/get-group/?groupId=${groupId}`);
-
-        setExpenses(response.data.group.expenses);
+        
       } catch (error) {
         console.error("Error fetching expenses:", error);
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
 
-    fetchExpenses();
-  }, [groupId]);
-
-  useEffect(() => {
-    if (currentUserId) {
-        console.log("Current User ID:", currentUserId);
-    }
-}, [currentUserId]);
+    fetchCurrentUser();
+  }, []);
 
   const handleAddExpense = async () => {
     if (!newExpense.description || !newExpense.amount) return;
@@ -73,11 +71,87 @@ const GroupHomePage = () => {
       console.log(response.data.expense);
 
       setExpenses((prevExpenses) => [...prevExpenses, response.data.expense]);
+      setIsAddingExpense(false);
       
     } catch (error) {
       console.error("Error adding expense:", error);
     }
   };
+
+  const handlePay = async (expenseId) => {
+    // const memberId = localStorage.getItem('token'); // Current user ID
+
+    try{
+        console.log(currentUserId);
+    const payResponse = await axios.post('/pay-expense', { groupId, 
+        expenseId,
+        "memberId" : currentUserId });
+
+        console.log(payResponse.data.group.expenses)
+        setExpenses(payResponse.data.group.expenses); //WHAT TO DO IN THIS CASE ??????????????????????????????????????????????????????????????
+
+    }catch(err){
+        console.log(err);
+        console.log(err.status);
+        console.log(err.error);
+    }
+
+    // try{
+
+    //     const response = await axios.get(`/get-group/${groupId}`);
+    // }catch(err){
+    //     console.log(err);
+    //     console.log(err.error);
+    // }
+    // // Re-fetch expenses after payment
+    // setExpenses(response.data.expenses);
+  };  
+
+// ----------------------------pagination logic ----------------------------------------------------------
+
+// Function to fetch paginated data
+const fetchData = async (page, pageSize) => {
+    console.log('grouphome page fetching data');
+    const response = await axios.get(`/group/expenses/?page=${page}&pageSize=${pageSize}&groupId=${groupId}`);
+    const data = await response.data;//array of expense objects
+    return data; // Adjust based on your API's response structure
+
+  };
+
+  console.log('before pagination');
+
+const { expenses, loadMore, loading, hasMore, page} = usePagination(fetchData, 3);
+
+useEffect(() => {
+    loadMore(1); // Trigger load on mount
+  }, []);
+  
+
+
+// Scroll event handler
+const handleScroll = useCallback(() => {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+    // Scroll Down: Load next page
+    if (scrollTop + clientHeight >= scrollHeight - 10 && hasMore && !loading) {
+      loadMore(page + 1); // Load the next page
+    }
+
+    // Scroll Up: Load previous page
+    if (scrollTop <= 10 && page > 1 && !loading) {
+      const previousScrollHeight = document.documentElement.scrollHeight; // Get current scroll height before prepending
+      loadMore(page - 1, true, previousScrollHeight); // Pass previousScrollHeight for adjustment
+    }
+  }, [hasMore, loading, page, loadMore]);
+
+  // Attach scroll listener on mount and detach on unmount
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+
+
 
   return (
     <div className="bg-gray-900 text-white min-h-screen flex flex-col justify-between">
@@ -88,6 +162,7 @@ const GroupHomePage = () => {
 
       {/* Expenses List */}
       <div className="flex-1 overflow-y-scroll p-4">
+        {!hasMore && <p>No more items to load</p>}
         {loading ? (
           <p className="text-center text-gray-400">Loading expenses...</p>
         ) : (
@@ -114,6 +189,16 @@ const GroupHomePage = () => {
                 <p className="text-xs mt-2">
                   {expense.payer === currentUserId ? "You" : "Other User"}
                 </p>
+                {(expense.splits.find((obj) =>  obj.member === currentUserId
+                )|| { amount: 0 }
+                ).paid? '(Paid)' : (
+                  <button className={`${
+                    expense.payer === currentUserId
+                      ? "bg-gray-700 text-gray-300 hover:bg-gray-500"
+                      : "bg-teal-700 text-white hover:bg-teal-500"
+                  }  p-4 rounded-full shadow-lg`} onClick={() => handlePay(expense._id,currentUserId)}>Pay Now</button>
+                )}
+
               </div>
             </div>
           ))
@@ -122,6 +207,7 @@ const GroupHomePage = () => {
 
       {/* Floating Add Expense Button */}
       <div className="fixed bottom-4 right-4">
+        
         {isAddingExpense ? (
           <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
             <input

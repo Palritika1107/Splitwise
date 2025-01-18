@@ -11,7 +11,7 @@ import axios from 'axios';
 // things to fix 1) decrease distance between splitwise logo and text 2)the login box is oveerflowing not responsive 
 
 
-axios.defaults.baseURL = 'http://localhost:5000';
+axios.defaults.baseURL = 'http://localhost:000';
 const Login = () => {
 
   const [isSignup,setIsSignup] = useState(true);

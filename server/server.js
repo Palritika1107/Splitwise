@@ -385,18 +385,28 @@ app.post("/create-group", auth, async (req, res) => {
 
   app.post('/pay-expense', async (req, res) => {
     const { groupId, expenseId, memberId } = req.body;
+    console.log("pay-expense");
   
     try {
       const group = await GroupModel.findById(groupId);
       if (!group) return res.status(404).json({ error: 'Group not found' });
+
+      console.log('1------');
   
       const expense = group.expenses.id(expenseId);
+      
       if (!expense) return res.status(404).json({ error: 'Expense not found' });
-  
+
+      console.log('2------');
+      console.log(expense);
+      debugger;
       const split = expense.splits.find((s) => s.member.toString() === memberId);
+      
       if (!split || split.paid) {
         return res.status(400).json({ error: 'No payment due or already paid' });
       }
+
+      console.log('3------');
   
       split.paid = true; // Mark the split as paid
       await group.save();
@@ -407,6 +417,32 @@ app.post("/create-group", auth, async (req, res) => {
       res.status(500).json({ error: 'Failed to update payment' });
     }
   });
+
+  // Route to fetch paginated items
+app.get("/group/expenses", async (req, res) => {
+
+    const { page, pageSize, groupId } = req.query;
+
+    const pageNumber = parseInt(page, 10);
+  const limitNumber = parseInt(pageSize, 10);
+
+    try {
+        const group = await GroupModel.findOne(
+          { _id: groupId },
+          { expenses: { $slice: [(pageNumber - 1) * limitNumber, limitNumber] } } // Apply skip and limit
+        );
+    
+        if (!group) {
+          return res.status(404).json({ error: "Group not found" });
+        }
+    
+        res.json(group.expenses); // Return the paginated expenses
+      } catch (err) {
+        console.error("Error fetching expenses:", err);
+        res.status(500).json({ error: "Internal server error" });
+      }
+    
+  });
   
   
 
@@ -414,6 +450,6 @@ app.post("/create-group", auth, async (req, res) => {
 
 
 app.listen(
-    5000,() => {
-    console.log("server started on port 5000")
+    8000,() => {
+    console.log("server started on port 8000")
 });

@@ -7,7 +7,8 @@ const AddSplit = ({ groupId }) => {
   useEffect(() => {
     const fetchExpenses = async () => {
       const response = await axios.get(`/get-group/${groupId}`);
-      setExpenses(response.data.group.expenses);
+      setExpenses(response.data.group.
+        expenses);
     };
 
     fetchExpenses();
@@ -19,7 +20,8 @@ const AddSplit = ({ groupId }) => {
     // Re-fetch expenses after payment
     const response = await axios.get(`/get-group/${groupId}`);
     setExpenses(response.data.expenses);
-  };
+  };  
+
 
   return (
     <div>

@@ -1,0 +1,45 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // Debug Backend
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Backend",
+      "program": "${workspaceFolder}/server/server.js", // Replace with your backend entry file
+      "cwd": "${workspaceFolder}", // Working directory
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "outFiles": ["${workspaceFolder}/**/*.js"] // Include source maps if using TypeScript
+    },
+    // Attach to Backend
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to Backend",
+      "port": 9229, // Node.js debug port
+      "restart": false,
+      "skipFiles": ["<node_internals>/**"],
+      "timeout": 10000
+    },
+    // Debug Frontend (Vite)
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Debug Frontend",
+      "url": "http://localhost:5173", // Vite development server
+      "webRoot": "${workspaceFolder}/src", // Adjust based on your project's structure
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug Full Stack",
+      "configurations": ["Debug Backend", "Debug Frontend"] // Combine backend and frontend configurations
+    }
+  ]
+}
