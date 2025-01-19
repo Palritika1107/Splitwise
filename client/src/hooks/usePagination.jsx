@@ -7,7 +7,7 @@ const usePagination = (fetchExpenses, pageSize, setMainExpenses) => {
   const [page, setPage] = useState(1); // Current page
 
   const loadMore = useCallback(
-    async (newPage, isScrollUp = false, previousScrollHeight = 0) => {
+    async (newPage, isScrollUp = true, previousScrollHeight = 0) => {
       if (loading || loadedPages.has(newPage)) return; // Prevent duplicate calls
       setLoading(true);
 
@@ -28,6 +28,13 @@ const usePagination = (fetchExpenses, pageSize, setMainExpenses) => {
         setLoadedPages((prev) => new Set(prev).add(newPage));
         setHasMore(newExpenses.length === pageSize);
         setPage(newPage);
+
+        if (isScrollUp && previousScrollHeight) {
+          setTimeout(() => {
+            document.documentElement.scrollTop =
+              document.documentElement.scrollHeight - previousScrollHeight;
+          }, 0);
+        }
       } catch (error) {
         console.error("Error loading more expenses:", error);
       } finally {

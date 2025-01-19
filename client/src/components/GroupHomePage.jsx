@@ -71,7 +71,7 @@ useEffect(() => {
       console.log(response.data);
       console.log(response.data.expense);
 
-      setExpenses((prevExpenses) => [response.data.expense,...prevExpenses]);//todo -> tored in revrse 
+      setExpenses((prevExpenses) => [...prevExpenses,response.data.expense]);//todo -> tored in revrse 
       setIsAddingExpense(false);
       
     } catch (error) {
@@ -115,7 +115,7 @@ const fetchData = async (page, pageSize) => {
     console.log('grouphome page fetching data');
     const response = await axios.get(`/group/expenses/?page=${page}&pageSize=${pageSize}&groupId=${groupId}`);
     const data = await response.data;//array of expense objects
-    return data; // Adjust based on your API's response structure
+    return data.reverse(); // Adjust based on your API's response structure
 
   };
 
@@ -123,9 +123,7 @@ const fetchData = async (page, pageSize) => {
 
 const {loadMore, loading, hasMore, page} = usePagination(fetchData, 4,setExpenses);
 
-useEffect(() => {
-    loadMore(1); // Trigger load on mount
-  }, []);
+
   
 
 
@@ -133,15 +131,16 @@ useEffect(() => {
 const handleScroll = useCallback(() => {
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
-    // Scroll Down: Load next page
-    if (scrollTop + clientHeight >= scrollHeight - 10 && hasMore && !loading) {
+    // Scroll up: Load next page
+    
+    if (scrollTop <= 10 && !loading) {
       loadMore(page + 1); // Load the next page
     }
 
-    // Scroll Up: Load previous page
-    if (scrollTop <= 10 && page > 1 && !loading) {
+    // Scroll down: Load previous page
+    if (scrollTop + clientHeight >= scrollHeight - 10 && hasMore && !loading && page>1) {
       const previousScrollHeight = document.documentElement.scrollHeight; // Get current scroll height before prepending
-      loadMore(page - 1, true, previousScrollHeight); // Pass previousScrollHeight for adjustment
+      loadMore(page - 1, false, previousScrollHeight); // Pass previousScrollHeight for adjustment
     }
   }, [hasMore, loading, page, loadMore]);
 
@@ -150,6 +149,16 @@ const handleScroll = useCallback(() => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
+
+  useEffect(() => {
+    loadMore(1).then(() => {
+      // Scroll to bottom after loading the first page
+      setTimeout(() => {
+        window.scrollTo(0, document.documentElement.scrollHeight);
+      }, 0);
+    });
+  }, []);
+  
 
 
 
