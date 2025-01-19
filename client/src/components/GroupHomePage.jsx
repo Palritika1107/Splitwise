@@ -73,6 +73,10 @@ useEffect(() => {
 
       setExpenses((prevExpenses) => [...prevExpenses,response.data.expense]);//todo -> tored in revrse 
       setIsAddingExpense(false);
+      //oon adding new expense scroll to bottom
+      setTimeout(() => {
+        window.scrollTo(0, document.documentElement.scrollHeight);
+      }, 0);
       
     } catch (error) {
       console.error("Error adding expense:", error);
