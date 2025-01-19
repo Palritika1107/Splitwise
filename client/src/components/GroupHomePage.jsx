@@ -132,15 +132,17 @@ const handleScroll = useCallback(() => {
     const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
     // Scroll up: Load next page
+    // const bottom = e.target.scrollHeight === e.target.scrollTop + e.target.clientHeight;
     
-    if (scrollTop <= 10 && !loading) {
-      loadMore(page + 1); // Load the next page
+    if ((scrollTop <= 10 || scrollTop === 0) && !loading) {
+      const previousScrollHeight = document.documentElement.scrollHeight; // Get current scroll height before prepending
+      loadMore(page + 1,true,previousScrollHeight); // Load the next page
     }
 
     // Scroll down: Load previous page
     if (scrollTop + clientHeight >= scrollHeight - 10 && hasMore && !loading && page>1) {
-      const previousScrollHeight = document.documentElement.scrollHeight; // Get current scroll height before prepending
-      loadMore(page - 1, false, previousScrollHeight); // Pass previousScrollHeight for adjustment
+      
+      loadMore(page - 1, false ); // Pass previousScrollHeight for adjustment
     }
   }, [hasMore, loading, page, loadMore]);
 
@@ -151,7 +153,8 @@ const handleScroll = useCallback(() => {
   }, [handleScroll]);
 
   useEffect(() => {
-    loadMore(1).then(() => {
+    loadMore(1)
+    .then(() => {
       // Scroll to bottom after loading the first page
       setTimeout(() => {
         window.scrollTo(0, document.documentElement.scrollHeight);
@@ -171,7 +174,7 @@ const handleScroll = useCallback(() => {
       </header>
 
       {/* Expenses List */}
-      <div className="flex-1 overflow-y-scroll p-4">
+      <div className="flex-1 overflow-y-scroll p-4 min-h-[110vh]">
         {!hasMore && <p>No more items to load</p>}
         {loading ? (
           <p className="text-center text-gray-400">Loading expenses...</p>
