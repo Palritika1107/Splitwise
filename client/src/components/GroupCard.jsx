@@ -67,7 +67,7 @@ const GroupCard = () => {
               to={{
                 pathname: `/group/${group._id}`,
               }}
-              state={{ groupName: group.name, groupId: group._id }}
+              state={{ groupName: group.groupName, groupId: group._id ,nosOfMembers:group.members.length }}
               className="text-blue-500 hover:underline"
             >
               <li

@@ -1,7 +1,8 @@
-import React, { useState, useEffect,useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useParams, useLocation } from 'react-router-dom';
 import usePagination from "../hooks/usePagination.jsx";
+import { Link } from "react-router-dom";
 
 
   
@@ -10,7 +11,7 @@ const GroupHomePage = () => {
 
     const { id } = useParams(); // Extract the group ID from the URL
   const location = useLocation();
-  const { groupName , groupId } = location.state;
+  const { groupName , groupId, nosOfMembers } = location.state;
   const [expenses, setExpenses] = useState([]); // All expenses
 
 //   const [expenses, setExpenses] = useState([]);
@@ -44,6 +45,7 @@ useEffect(() => {
 
         setCurrentUserId(userRes.data.user._id.toString());
         console.log(currentUserId);
+        
 
         
       } catch (error) {
@@ -174,7 +176,9 @@ const handleScroll = useCallback(() => {
     <div className="bg-gray-900 text-white min-h-screen flex flex-col justify-between">
       {/* Header */}
       <header className="p-4 text-teal-600 bg-gray-800 text-lg font-bold">
-        Group Expenses
+        <Link to={-1}> ⬅️</Link>
+        <h4>{groupName}</h4>
+        <h2>{nosOfMembers} members</h2>
       </header>
 
       {/* Expenses List */}
@@ -223,10 +227,11 @@ const handleScroll = useCallback(() => {
       </div>
 
       {/* Floating Add Expense Button */}
-      <div className="fixed bottom-4 right-4">
+      <div className="fixed bottom-0 left-0 w-full bg-gray-900 bg-opacity-75 p-4">
+      <div className=" bottom-4 right-4">
         
         {isAddingExpense ? (
-          <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
+          <div className="bg-gray-800 p-4 rounded-lg shadow-lg w-4/12">
             <input
               type="text"
               value={newExpense.description}
@@ -265,9 +270,10 @@ const handleScroll = useCallback(() => {
             onClick={() => setIsAddingExpense(true)}
             className="bg-teal-600 text-white p-4 rounded-full shadow-lg hover:bg-teal-500"
           >
-            🧾Add expense
+            🧾Split an expense
           </button>
          )}
+         </div>
       </div>
     </div>
   );
