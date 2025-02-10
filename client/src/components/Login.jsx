@@ -11,7 +11,8 @@ import axios from 'axios';
 // things to fix 1) decrease distance between splitwise logo and text 2)the login box is oveerflowing not responsive 
 
 
-axios.defaults.baseURL = 'http://localhost:000';
+// axios.defaults.baseURL = 'http://localhost:8000';
+axios.defaults.baseURL = `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}`;
 const Login = () => {
 
   const [isSignin,setIsSignin] = useState(true);

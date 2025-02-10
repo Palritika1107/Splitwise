@@ -22,7 +22,7 @@ import GroupHomePage from './components/GroupHomePage';
 
 
 
-axios.defaults.baseURL = 'http://localhost:8000';
+axios.defaults.baseURL = `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}`;
 
 
 
