@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const SigninPage = ({ setIsSignin, setError, error }) => {
   const [formValues, setFormValues] = useState({
@@ -36,7 +37,7 @@ const SigninPage = ({ setIsSignin, setError, error }) => {
   };
 
   return (
-    <div className="flex justify-center items-center w-full">
+    <div className="flex flex-col justify-center items-center w-full ">
       <form
         onSubmit={handleSubmitSignin}
         className="bg-gray-800 p-6 rounded-2xl shadow-lg w-full max-w-md border border-gray-700"
@@ -80,7 +81,19 @@ const SigninPage = ({ setIsSignin, setError, error }) => {
         {/* Error Message */}
         {error && <p className="text-red-500 text-sm text-center mt-2">{error}</p>}
       </form>
+      <div>
+      <Link
+          to="#"
+          onClick={() => {
+            setIsSignin(false)
+          }}
+          className="text-white bg-red-500 hover:bg-red-600 py-2 px-4 rounded"
+        >
+          Sign-Up
+        </Link>
+      </div>
     </div>
+    
   );
 };
 
