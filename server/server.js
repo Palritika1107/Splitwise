@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+require('dotenv').config();
 
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = "hellorp2024rp";
@@ -12,8 +13,10 @@ const ObjectId = mongoose.Types.ObjectId;
 
 
 // let users =[]; //array of users
+mongoose.connect(process.env.MONGO_URI)  // Access variable using process.env
+  .then(() => console.log('MongoDB Connected'))
+  .catch(err => console.log(err));
 
-mongoose.connect("mongodb+srv://admin:fGUpHgZrZNyqRL7Y@cluster0.zf3dh.mongodb.net/splitwise-database");
 
 
 app.use(cors());
