@@ -4,7 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = "hellorp2024rp";
+
 const { UserModel , GroupModel } = require("./db");
 const mongoose = require("mongoose");
 // const Schema = mongoose.Schema;
@@ -19,12 +19,15 @@ mongoose.connect(process.env.MONGO_URI)  // Access variable using process.env
 
 
 
-app.use(cors());
+// app.use(cors());
+app.use(cors({ origin: "*" })); 
 app.use(express.json());
 
 
 
-
+app.get("/", (req, res) => {
+  res.json({ message: "Backend is working on Vercel!" });
+});
 
 function auth(req,res,next){
 
@@ -38,7 +41,7 @@ function auth(req,res,next){
     }
 
     try {
-        const decodedInfo = jwt.verify(token, JWT_SECRET);
+        const decodedInfo = jwt.verify(token, process.env.JWT_SECRET);
         console.log(typeof(decodedInfo.id));
         req.userId = decodedInfo.id;
         next();
@@ -109,7 +112,7 @@ app.post('/signin' , async function(req,res){
 
             "id" : user._id.toString()
 
-        },JWT_SECRET);
+        },process.env.JWT_SECRET);
         // user["token"] = token;
 
         // console.log(users);
@@ -465,7 +468,9 @@ app.get("/group/expenses", async (req, res) => {
 
 
 
-app.listen(
-    8000,() => {
-    console.log("server started on port 8000")
-});
+// app.listen(
+//     8000,() => {
+//     console.log("server started on port 8000")
+// });
+
+module.exports = app;
