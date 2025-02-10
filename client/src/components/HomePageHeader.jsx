@@ -7,6 +7,7 @@ const HomePageHeader = ({ openPopup }) => {
   const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate(); // To programmatically redirect
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = () => {
     // Remove the token from localStorage
@@ -49,35 +50,58 @@ const HomePageHeader = ({ openPopup }) => {
           </a>
         </h1>
 
-        <div>
-          <button
-            id="mobile-open-button"
-            className="text-3xl sm:hidden focus:outline-none"
+        <div className="relative">
+      {/* ☰ Button (Only Visible on Small Screens) */}
+      <button
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        className="text-3xl sm:hidden focus:outline-none"
+      >
+        ☰
+      </button>
+
+      {/* Navigation Links (Big Screen) */}
+      <nav className="hidden sm:flex space-x-8 text-xl" aria-label="main">
+        <Link to="#groups" className="hover:opacity-90">
+          Groups
+        </Link>
+        <Link to="#" onClick={openPopup} className="hover:opacity-90">
+          Friends
+        </Link>
+        <Link to="#activity" className="hover:opacity-90">
+          Activity
+        </Link>
+        <Link
+          to="#account"
+          className="relative border-2 border-teal-400 rounded-full hover:opacity-90 p-4"
+        >
+          👤
+          <span className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-max px-2 py-1 bg-gray-800 text-white text-sm rounded shadow-lg opacity-0 hover:opacity-100 transition-opacity">
+            {loading ? "Loading..." : userName}
+          </span>
+        </Link>
+      </nav>
+
+      {/* Mobile Menu (Visible on Click) */}
+      {isMenuOpen && (
+        <div className="absolute right-0 top-12 bg-gray-800 shadow-md rounded-lg flex flex-col space-y-4 p-4 sm:hidden">
+          <Link to="#groups" className="hover:opacity-90">
+            Groups
+          </Link>
+          <Link to="#" onClick={openPopup} className="hover:opacity-90">
+            Friends
+          </Link>
+          <Link to="#activity" className="hover:opacity-90">
+            Activity
+          </Link>
+          <Link
+            to="#account"
+            className="border-2 border-teal-400 rounded-full hover:opacity-90 p-4"
           >
-            ☰
-          </button>
-          <nav className="hidden sm:block space-x-8 text-xl" aria-label="main">
-            <Link to="#groups" className="hover:opacity-90">
-              Groups
-            </Link>
-            <Link to="#" onClick={openPopup} className="hover:opacity-90">
-              Friends
-            </Link>
-            <Link to="#activity" className="hover:opacity-90">
-              Activity
-            </Link>
-            <Link
-              to="#account"
-              className="relative border-2 border-teal-400 rounded-full hover:opacity-90 p-4"
-            >
-              👤
-              <span className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-max px-2 py-1 bg-gray-800 text-white text-sm rounded shadow-lg opacity-0 hover:opacity-100 transition-opacity">
-                {loading ? "Loading..." : userName}
-              </span>
-            </Link>
-            {/* <Link to="#account" className="border-2 border-teal-400 rounded-full hover:opacity-90 p-4">👤</Link> */}
-          </nav>
+            👤
+          </Link>
         </div>
+      )}
+    </div>
 
         <Link
           to="#"
