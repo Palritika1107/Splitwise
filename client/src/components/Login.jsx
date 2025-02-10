@@ -1,89 +1,57 @@
-import React, { useEffect , useState } from "react";
-import { Link } from 'react-router-dom';
-
-
-
+import React, { useState } from "react";
 import SigninPage from "./SigninPage";
 import SignupPage from "./SignupPage";
+import axios from "axios";
 
-import axios from 'axios';
-
-// things to fix 1) decrease distance between splitwise logo and text 2)the login box is oveerflowing not responsive 
-
-
-// axios.defaults.baseURL = 'http://localhost:8000';
 axios.defaults.baseURL = `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}`;
+
 const Login = () => {
-
-  const [isSignin,setIsSignin] = useState(true);
-  const [error, setError] = useState('');
-  
-    
-
-    
-
-
-
+  const [isSignin, setIsSignin] = useState(true);
+  const [error, setError] = useState("");
 
   return (
-    <>
-    {/* <div className=" bg-gray-900 text-white min-h-screen flex items-center justify-center"> '
-    */}
-      <div className="text-teal-600 mx-auto w-6/12  flex  max-w-800px  my-auto ">
-        {/* //left half */}
-        <div className="w-8/12  p-9 bg-white flex flex-col justify-around">
-           {/* heading 1 */}
-          <div className="flex  w-3/12 justify-between mx-auto">
-            <img className="w-10 block" src="/images/logo.png" alt="logo" />
-
-
-            <h2 className="text-black text-center w-4/12 font-bold mt-3 ml-1 ">
-              Splitwise
-            </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white px-4">
+      <div className="flex flex-wrap md:flex-nowrap shadow-lg rounded-3xl overflow-hidden w-full max-w-4xl border border-gray-700">
+        {/* Left Section */}
+        <div className="w-full md:w-7/12 p-6 flex flex-col justify-center bg-gray-800">
+          {/* Logo & Title */}
+          <div className="flex items-center justify-center mb-4">
+            <img className="w-10 h-10" src="/images/logo.png" alt="logo" />
+            <h2 className="text-white font-bold text-xl ml-2">Splitwise</h2>
           </div>
 
-          {/* <p>Less stress when sharing expenses with anyone.</p> */}
-          {/* heading 2 */}
-          <h1 className="font-bold w-3/12 text-2xl text-center  mx-auto p-4">{!isSignin ? "Sign up" : "Sign in"}</h1>
+          {/* Sign-in/Sign-up Heading */}
+          <h1 className="font-bold text-2xl text-center text-white mb-4">
+            {isSignin ? "Sign in" : "Sign up"}
+          </h1>
 
-          {/* icons */}
-          <div className="text-black font-extrabold flex mx-auto w-5/12 justify-around  p-4">
-            <div className="rounded-full h-10 w-10 text-center p-1.5 border-solid border-2 border-gray-300">
-              f
+          {/* Social Icons */}
+          <div className="flex justify-center gap-4 mb-4">
+            <div className="rounded-full h-10 w-10 flex items-center justify-center border-2 border-gray-700 text-gray-300">
+              F
             </div>
-            <div className="rounded-full h-10 w-10 text-center p-1.5 border-solid border-2 border-gray-300">
+            <div className="rounded-full h-10 w-10 flex items-center justify-center border-2 border-gray-700 text-gray-300">
               G+
             </div>
-            <div className="rounded-full h-10 w-10 text-center p-1.5 border-solid border-2 border-gray-300">
+            <div className="rounded-full h-10 w-10 flex items-center justify-center border-2 border-gray-700 text-gray-300">
               in
             </div>
           </div>
 
-
-          {/* signin or signup form */}
-
-
-          {!isSignin && <SignupPage  isSignin={isSignin} setIsSignin={setIsSignin} setError={setError} error={error}/>}
-          {isSignin && <SigninPage  isSignin={isSignin} setIsSignin={setIsSignin} setError={setError} error={error}/>}
-
-
-
-          
+          {/* Sign-in/Sign-up Form */}
+          {!isSignin ? (
+            <SignupPage isSignin={isSignin} setIsSignin={setIsSignin} setError={setError} error={error} />
+          ) : (
+            <SigninPage isSignin={isSignin} setIsSignin={setIsSignin} setError={setError} error={error} />
+          )}
         </div>
-        
 
-        {/* //right half */}
-        {/* this part if going out of parent box fix it  */}
-
-        <div className="w-4/12  bg-teal-400  text-white flex justify-center items-center p-8 ">
-          <p className="text-bold text-2xl inline-block">
-            {/* {" "} */}
-            Less stress when sharing expenses
-          </p>
+        {/* Right Section */}
+        <div className="w-full md:w-5/12 bg-teal-600 text-white flex items-center justify-center p-6">
+          <p className="text-lg text-center">Less stress when sharing expenses</p>
         </div>
       </div>
-      {/* </div> */}
-    </>
+    </div>
   );
 };
 
